@@ -1,0 +1,22 @@
+{
+  "name": "action-network",
+  "servePort": 8000,
+  "partitions": {
+      "lib": {
+          "path": "lib",
+          "target": "ReplicatedStorage.Network"
+      },
+      "action": {
+          "path": "example/SampleAction.lua",
+          "target": "ReplicatedStorage.SampleAction"
+      },
+      "server": {
+        "path": "example/Server.server.lua",
+        "target": "ServerScriptService.Server"
+      },
+      "client": {
+          "path": "example/Client.client.lua",
+          "target": "StarterPlayer.StarterPlayerScripts.Client"
+      }
+  }
+}
