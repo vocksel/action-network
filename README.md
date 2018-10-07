@@ -41,3 +41,19 @@ network.dispatch(fooAction(true, false))
 ```
 
 This will print "Player1 disaptched fooAction with args: true false" on the server. And that's all there is to it.
+
+## API
+
+**`network.init()`**
+
+Server only. Handles creating the RemoteEvent needed for communicating between server/client, and listening for any dispatched actions.
+
+This must be called before any dispatch calls.
+
+**`network.on(string actionType, function callback)`**
+
+Server only. Sets up a listener for an action with a `type` of `actionType`. `callback` is run when that action is dispatched.
+
+**`network.dispatch(table action)`**
+
+Client only. Dispatches `action` to the server. Assuming you called `network.on()` for the action type, the associated callback will be run.
