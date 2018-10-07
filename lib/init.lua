@@ -28,7 +28,7 @@ function network.init()
     local remote = createRemote()
 
     remote.OnServerEvent:Connect(function(player, action)
-        assert(typeof(action) == "table")
+        assert(type(action) == "table")
 
         for actionType, callback in pairs(network._actions) do
             if action.type == actionType then
@@ -40,15 +40,18 @@ end
 
 -- server only
 function network.on(actionType, callback)
-    assert(type(actionType) == "string")
-    assert(type(callback) == "function")
+    assert(runService:IsServer(), "'network.on()' can only be called from the server")
+    assert(type(actionType) == "string", ("bad argument #1 to 'network.on()' (string expected, got %s)"):format(type(actionType)))
+    assert(type(callback) == "function", ("bad argument #2 to 'network.on()' (function expected, got %s"):format(type(callback)))
 
     network._actions[actionType] = callback
 end
 
 -- client only
 function network.dispatch(action)
-    assert(type(action) == "table")
+    assert(runService:IsClient(), "'network.dispatch()' can only be called from a client")
+    assert(type(action) == "table", ("bad argument #1 to 'network.dispatch() '(table expected, got %s)"):format(type(action)))
+
     local remote = clientGetRemote()
     remote:FireServer(action)
 end
