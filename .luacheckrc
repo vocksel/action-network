@@ -1,5 +1,11 @@
 files[".luacheckrc"].global = false
 
+stds.testez = {
+    read_globals = {
+        "describe", "it", "expect", "itFOCUS", "itSKIP", "FOCUS", "SKIP"
+    }
+}
+
 stds.roblox = {
     globals = {
         "script", "workspace", "plugin",
@@ -26,4 +32,4 @@ ignore = {
 
 max_line_length = false
 
-std = "lua51+roblox"
+std = "lua51+roblox+testez"

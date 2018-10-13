@@ -17,6 +17,10 @@
       "client": {
           "path": "example/Client.client.lua",
           "target": "StarterPlayer.StarterPlayerScripts.Client"
+      },
+      "TestEZ": {
+          "path": "modules/TestEZ/lib",
+          "target": "ReplicatedStorage.TestEZ"
       }
   }
 }
