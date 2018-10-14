@@ -1,3 +1,4 @@
+local players = game:GetService("Players")
 local runService = game:GetService("RunService")
 
 local t = require(script.Parent.t)
@@ -63,6 +64,24 @@ function Network:dispatch(action)
         self._remote:FireAllClients(action)
     else
         self._remote:FireServer(action)
+    end
+end
+
+local dispatchToCheck = t.tuple(t.instance("Player"), t.table)
+function Network:dispatchTo(player, action)
+    assert(dispatchToCheck(player, action))
+
+    self._remote:FireClient(player, action)
+end
+
+local dispatchExcludingCheck = t.tuple(t.instance("Player"), t.table)
+function Network:dispatchExcept(player, action)
+    assert(dispatchExcludingCheck(player, action))
+
+    for _, otherPlayer in pairs(players:GetPlayers()) do
+        if player ~= otherPlayer then
+            self._remote:FireClient(otherPlayer, action)
+        end
     end
 end
 

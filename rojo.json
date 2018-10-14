@@ -10,6 +10,10 @@
           "path": "example/SampleAction.lua",
           "target": "ReplicatedStorage.SampleAction"
       },
+      "message-action": {
+          "path": "example/Message.lua",
+          "target": "ReplicatedStorage.Message"
+      },
       "server": {
         "path": "example/Server.server.lua",
         "target": "ServerScriptService.Server"

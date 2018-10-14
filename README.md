@@ -51,3 +51,11 @@ Sets up a listener for an action with a `type` of `actionType`. `callback` is ru
 When called from the client, dispatches `action` to the server. When called from the server, dispatches `action` to _all_ clients.
 
 Assuming you called `network:on()` for the action type, the associated callback will be run.
+
+**`network:dispatchTo(Player player, table action)`**
+
+Dispatches an action from the server to a specific player
+
+**`network:dispatchExcept(Player player, table action)`**
+
+Dispatches an action from the server to all players _except_ `player`. Useful when the client changes something locally, tells the server about it, and after verification the server can then inform all other clients about the change.

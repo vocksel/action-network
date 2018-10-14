@@ -7,3 +7,7 @@ network:on("sampleAction", function(action)
 end)
 
 network:dispatch(sampleAction("ping"))
+
+network:on("message", function(action)
+    print(action.message)
+end)
