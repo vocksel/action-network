@@ -1,9 +1,13 @@
 local runService = game:GetService("RunService")
 
+local t = require(script.Parent.t)
+
 local Network = {}
 Network.__index = Network
 
 function Network.new(remote)
+    assert(t.instance("RemoteEvent")(remote))
+
     local self = {}
 
     self._remote = remote
@@ -14,7 +18,7 @@ end
 
 function Network:_serverInit()
     self._remote.OnServerEvent:Connect(function(player, action)
-        assert(type(action) == "table")
+        assert(t.table(action))
 
         local callback = self._actions[action.type]
         if callback then
@@ -25,7 +29,7 @@ end
 
 function Network:_clientInit()
     self._remote.OnClientEvent:Connect(function(action)
-        assert(type(action) == "table")
+        assert(t.table(action))
 
         local callback = self._actions[action.type]
         if callback then
@@ -42,11 +46,16 @@ function Network:init()
     end
 end
 
+local onCheck = t.tuple(t.string, t.callback)
 function Network:on(actionType, callback)
+    assert(onCheck(actionType, callback))
+
     self._actions[actionType] = callback
 end
 
 function Network:dispatch(action)
+    assert(t.table(action))
+
     if runService:IsServer() then
         self._remote:FireAllClients(action)
     else
