@@ -12,12 +12,13 @@ function Network.new(remote)
 
     self._remote = remote
     self._actions = {}
+    self._connection = nil
 
     return setmetatable(self, Network)
 end
 
 function Network:_serverInit()
-    self._remote.OnServerEvent:Connect(function(player, action)
+    self._connection = self._remote.OnServerEvent:Connect(function(player, action)
         assert(t.table(action))
 
         local callback = self._actions[action.type]
@@ -28,7 +29,7 @@ function Network:_serverInit()
 end
 
 function Network:_clientInit()
-    self._remote.OnClientEvent:Connect(function(action)
+    self._connection = self._remote.OnClientEvent:Connect(function(action)
         assert(t.table(action))
 
         local callback = self._actions[action.type]
@@ -39,6 +40,8 @@ function Network:_clientInit()
 end
 
 function Network:init()
+    assert(not self._connection, "The RemoteEvent has already been connected. Was init() called twice?")
+
     if runService:IsServer() then
         self:_serverInit()
     else
