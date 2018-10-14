@@ -1,3 +1,5 @@
+local runService = game:GetService("RunService")
+
 local Network = {}
 Network.__index = Network
 
@@ -10,27 +12,46 @@ function Network.new(remote)
     return setmetatable(self, Network)
 end
 
--- server only
-function Network:init()
+function Network:_serverInit()
     self._remote.OnServerEvent:Connect(function(player, action)
         assert(type(action) == "table")
 
-        for actionType, callback in pairs(self._actions) do
-            if action.type == actionType then
-                callback(player, action)
-            end
+        local callback = self._actions[action.type]
+        if callback then
+            callback(player, action)
         end
     end)
 end
 
--- server only
+function Network:_clientInit()
+    self._remote.OnClientEvent:Connect(function(action)
+        assert(type(action) == "table")
+
+        local callback = self._actions[action.type]
+        if callback then
+            callback(action)
+        end
+    end)
+end
+
+function Network:init()
+    if runService:IsServer() then
+        self:_serverInit()
+    else
+        self:_clientInit()
+    end
+end
+
 function Network:on(actionType, callback)
     self._actions[actionType] = callback
 end
 
--- client only
 function Network:dispatch(action)
-    self._remote:FireServer(action)
+    if runService:IsServer() then
+        self._remote:FireAllClients(action)
+    else
+        self._remote:FireServer(action)
+    end
 end
 
 return Network

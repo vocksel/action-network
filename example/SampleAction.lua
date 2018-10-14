@@ -1,7 +1,6 @@
-return function(a, b)
+return function(arg)
     return {
         type = "sampleAction",
-        a = a,
-        b = b
+        arg = arg
     }
 end
