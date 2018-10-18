@@ -1,61 +1,80 @@
-# action-network
+# network
 
-A simple networking module that works off of Rodux-style actions.
+Easy communication between the server and clients with a familiar API.
 
-## Usage
-
-To start off you just need to create a basic action for the server and client to use:
+## Quick Start
 
 ```lua
-local function fooAction(a, b)
-    return {
-        type = "fooAction",
-        a = a,
-        b = b
-    }
-end
-
-return fooAction
-```
-
-You can then setup listeners on the server or client using `on` to listen for
-the action's type, and then a handler for it.
-
-```lua
+-- client
 local network = require(game.ReplicatedStorage.Network)
 
-network:on("fooAction", function(player, action)
-    print(player, "dispatched", action.type, "with args:", action.a, action.b)
+local event = network:event("message")
+
+event:fireServer("foo")
+```
+
+```lua
+-- server
+local network = require(game.ReplicatedStorage.Network)
+
+local event = network:event("message")
+
+event:connect(function(player, message)
+    print(message) -- "foo"
 end)
 ```
 
-And on the client you dispatch the action to the server:
-
-```lua
-local network = require(game.ReplicatedStorage.Network)
-local fooAction = require(game.ReplicatedStorage.FooAction)
-
-network:dispatch(fooAction(true, false))
-```
-
-This will print "Player1 disaptched fooAction with args: true false" on the server. And that's all there is to it.
-
 ## API
 
-**`network:on(string actionType, function callback)`**
+**`network:event(string eventName)`**
 
-Sets up a listener for an action with a `type` of `actionType`. `callback` is run when that action is dispatched, and the action object is passed in as an argument.
+Returns an `Event` instance. Either a new one, or one that already exists by the given name.
 
-**`network:dispatch(table action)`**
+**`Event:connect(function callback)`**
 
-When called from the client, dispatches `action` to the server. When called from the server, dispatches `action` to _all_ clients.
+Sets `callback` as a listener, which will be called when the event is fired by the server or client (whichever one the event was not connected on).
 
-Assuming you called `network:on()` for the action type, the associated callback will be run.
+The callback is passed in the player that fired the event on the server, followed by any arguments. The client just gets arguments passed in.
 
-**`network:dispatchTo(Player player, table action)`**
+```lua
+-- client
+event:connect(function(...) end)
 
-Dispatches an action from the server to a specific player
+-- server
+event:connect(function(player, ...) end)
+```
 
-**`network:dispatchExcept(Player player, table action)`**
+**`Event:fireServer(Tuple arguments)`**
 
-Dispatches an action from the server to all players _except_ `player`. Useful when the client changes something locally, tells the server about it, and after verification the server can then inform all other clients about the change.
+Fires this event to the server. Client only.
+
+**`Event:fireAllClients(Tuple arguments)`**
+
+Fires this event to all clients. Server only.
+
+**`Event:fireTo(Player player, Tuple arguments)`**
+
+Fires this event to the given client. Server only.
+
+**`Event:fireExceptTo(Player excludedPlayer, Tuple arguments)`**
+
+Fires this event to all clients _except_ the one given.
+
+This is useful for replicating a client's local change. Typically the user will update something locally so it happens instantly. The server then verifies the change and will use this method to let all other clients know about the change.
+
+```lua
+-- server
+network:event("shoot"):connect(function(player, pos)
+    validate(pos)
+    -- after validating, let all other clients know about the change
+    network:event("replicateShot"):fireExceptTo(player, pos)
+end)
+```
+
+**`Event:fireToGroup(Array<Player> group, Tuple arguments)`**
+
+Fires this event to all the clients specified. Server only.
+
+**`Event:fireExceptToGroup(Array<Player> excludedGroup, Tuple arguments)`**
+
+Fires this event to all clients _except_ the ones specified. Server only.
