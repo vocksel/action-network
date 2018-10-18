@@ -52,12 +52,12 @@ function Event:init()
     end
 end
 
-function Event:fire(...)
-    if runService:IsServer() then
-        self._remote:FireAllClients(self.name, ...)
-    else
-        self._remote:FireServer(self.name, ...)
-    end
+function Event:fireServer(...)
+    self._remote:FireServer(self.name, ...)
+end
+
+function Event:fireAllClients(...)
+    self._remote:FireAllClients(self.name, ...)
 end
 
 local playerCheck = t.instance("Player")
