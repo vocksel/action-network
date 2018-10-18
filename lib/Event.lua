@@ -60,36 +60,39 @@ function Event:fire(...)
     end
 end
 
--- Ensures the given argument is either a single player or array of players.
-local playerGroupCheck = t.union(
-    t.instance("Player"),
-    t.array(t.instance("Player"))
-)
+local playerCheck = t.instance("Player")
+local playerGroupCheck = t.array(t.instance("Player"))
 
-function Event:fireTo(playerOrPlayers, ...)
-    assert(playerGroupCheck(playerOrPlayers))
+function Event:fireTo(player, ...)
+    assert(playerCheck(player))
 
-    if type(playerOrPlayers) ~= "table" then
-        playerOrPlayers = { playerOrPlayers }
-    end
+    self._remote:FireClient(player, self.name, ...)
+end
 
-    for _, player in pairs(playerOrPlayers) do
-        self._remote:FireClient(player, self.name, ...)
+function Event:fireExceptTo(excludedPlayer, ...)
+    assert(playerCheck(excludedPlayer))
+
+    for _, other in pairs(players:GetPlayers()) do
+        if excludedPlayer ~= other then
+            self:fireTo(other, ...)
+        end
     end
 end
 
-function Event:fireExceptTo(playerOrPlayers, ...)
-    assert(playerGroupCheck(playerOrPlayers))
+function Event:fireToGroup(group, ...)
+    assert(playerGroupCheck(group))
 
-    print(playerOrPlayers)
-
-    if type(playerOrPlayers) ~= "table" then
-        playerOrPlayers = { playerOrPlayers }
+    for _, player in pairs(group) do
+        self:fireTo(player, ...)
     end
+end
+
+function Event:fireExceptToGroup(excludedGroup, ...)
+    assert(playerGroupCheck(excludedGroup))
 
     for _, player in pairs(players:GetPlayers()) do
-        if not isInList(player, playerOrPlayers) then
-            self._remote:FireClient(player, self.name, ...)
+        if not isInList(player, excludedGroup) then
+            self:fireTo(player, ...)
         end
     end
 end
