@@ -52,6 +52,10 @@ function Event:init()
     end
 end
 
+function Event:connect(callback)
+    self._listeners[callback] = true
+end
+
 function Event:fireServer(...)
     self._remote:FireServer(self.name, ...)
 end
@@ -95,10 +99,6 @@ function Event:fireExceptToGroup(excludedGroup, ...)
             self:fireTo(player, ...)
         end
     end
-end
-
-function Event:connect(callback)
-    self._listeners[callback] = true
 end
 
 return Event
