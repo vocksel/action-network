@@ -1,13 +1,15 @@
 local repStorage = game:GetService("ReplicatedStorage")
-local network = require(repStorage.Network)
-local sampleAction = require(repStorage.SampleAction)
 
-network:on("sampleAction", function(action)
-    print("server responded with:", action.arg)
+local network = require(repStorage.Network)
+
+local sample = network:event("sample")
+
+sample:connect(function(response)
+    print("server responded with:", response)
 end)
 
-network:dispatch(sampleAction("ping"))
+sample:fire("ping")
 
-network:on("message", function(action)
-    print(action.message)
+network:event("message"):connect(function(message)
+    print(message)
 end)
